@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Exit Memo Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0b1020;
+      color: #f5f7ff;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 900px;
+      width: 100%;
+      padding: 2rem 1.5rem 3rem;
+    }
+    .card {
+      background: radial-gradient(circle at top left, #1d2340, #070918 55%);
+      border-radius: 18px;
+      padding: 2rem 1.75rem;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.9rem;
+      letter-spacing: 0.03em;
+    }
+    p.description {
+      margin-top: 0.25rem;
+      color: #a3aac6;
+      font-size: 0.95rem;
+    }
+    form {
+      margin-top: 1.5rem;
+    }
+    fieldset {
+      border: none;
+      margin: 0 0 1.75rem 0;
+      padding: 0;
+    }
+    fieldset + fieldset {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 1.5rem;
+    }
+    legend {
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      font-size: 1.05rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem 1.25rem;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-bottom: 1rem;
+    }
+    label {
+      font-size: 0.9rem;
+      color: #c5cae9;
+    }
+    .hint {
+      font-size: 0.78rem;
+      color: #8e94b8;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    textarea {
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(6, 11, 32, 0.85);
+      color: #f5f7ff;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+    input[type="file"] {
+      font-size: 0.85rem;
+      color: #c5cae9;
+    }
+    input::placeholder,
+    textarea::placeholder {
+      color: #7077a3;
+    }
+    textarea {
+      min-height: 84px;
+      resize: vertical;
+    }
+    input:focus,
+    textarea:focus {
+      border-color: #6c8dff;
+      box-shadow: 0 0 0 1px rgba(108, 141, 255, 0.35);
+      background: rgba(9, 16, 46, 0.95);
+    }
+    .actions {
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    button[type="submit"] {
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #6c8dff, #9b6dff);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.75rem 1.75rem;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(93, 123, 255, 0.55);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+    }
+    button[type="submit"]:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 28px rgba(93, 123, 255, 0.75);
+    }
+    button[type="submit"]:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 16px rgba(93, 123, 255, 0.5);
+      opacity: 0.96;
+    }
+    .secondary {
+      font-size: 0.8rem;
+      color: #9fa6d8;
+    }
+    .status {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: #9fa6d8;
+      white-space: pre-wrap;
+    }
+    code {
+      font-size: 0.8rem;
+      padding: 0.1rem 0.3rem;
+      background: rgba(15, 20, 50, 0.9);
+      border-radius: 4px;
+    }
+    @media (max-width: 600px) {
+      .card {
+        padding: 1.5rem 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Exit Memo Generator</h1>
+      <p class="description">
+        Upload a company PDF (optional) and fill in the deal details.  
+        This form will POST directly into your n8n workflow at <code>/webhook/exit-memo</code>.
+      </p>
+
+      <!-- Replace YOUR_N8N_HOST with your n8n host (e.g. https://n8n.example.com) -->
+      <!-- For test URL, use /webhook-test/exit-memo instead of /webhook/exit-memo -->
+      <form
+        id="exitMemoForm"
+        action="https://YOUR_N8N_HOST/webhook/exit-memo"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <fieldset>
+          <legend>Upload PDF</legend>
+          <div class="field">
+            <label for="pdf_file">Company / Deal PDF (optional)</label>
+            <input
+              type="file"
+              id="pdf_file"
+              name="pdf_file"
+              accept="application/pdf"
+            />
+            <div class="hint">
+              n8n will receive this as binary data under <code>binary.pdf_file</code>.  
+              Wire this into your PDF-parsing nodes as needed.
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Basic Deal Info</legend>
+          <div class="grid">
+            <div class="field">
+              <label for="company_name">Company Name *</label>
+              <input
+                type="text"
+                id="company_name"
+                name="company_name"
+                placeholder="Acme AI"
+                required
+              />
+            </div>
+            <div class="field">
+              <label for="exit_date">Exit Date *</label>
+              <input
+                type="date"
+                id="exit_date"
+                name="exit_date"
+                required
+              />
+            </div>
+            <div class="field">
+              <label for="acquirer">Acquirer *</label>
+              <input
+                type="text"
+                id="acquirer"
+                name="acquirer"
+                placeholder="Big Tech Corp"
+                required
+              />
+            </div>
+            <div class="field">
+              <label for="exit_value">Exit Value (in millions) *</label>
+              <input
+                type="number"
+                id="exit_value"
+                name="exit_value"
+                placeholder="250"
+                step="0.01"
+                required
+              />
+              <div class="hint">This maps to <code>exit_value</code> in n8n.</div>
+            </div>
+            <div class="field">
+              <label for="exit_type">Exit Type *</label>
+              <input
+                type="text"
+                id="exit_type"
+                name="exit_type"
+                placeholder="Acquisition / IPO / Secondary"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="acquirer_rationale">Acquirer Rationale</label>
+            <textarea
+              id="acquirer_rationale"
+              name="acquirer_rationale"
+              placeholder="Why did the acquirer pursue this transaction?"
+            ></textarea>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Investment Rounds & Thesis</legend>
+          <div class="field">
+            <label for="investment_rounds">
+              Investment Rounds
+            </label>
+            <textarea
+              id="investment_rounds"
+              name="investment_rounds"
+              placeholder='Example: [{"round": "Seed", "year": 2019, "amount": 3}, {"round": "Series A", "year": 2021, "amount": 15}]'
+            ></textarea>
+            <div class="hint">
+              Your n8n workflow treats this as <code>investment_rounds</code>.  
+              It can be an array or a freeform description; Claude will see the JSON/stringified form.
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="initial_thesis">Initial Investment Thesis</label>
+            <textarea
+              id="initial_thesis"
+              name="initial_thesis"
+              placeholder="Original thesis for backing the company, core bet, market, team, etc."
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label for="post_final_round">
+              Post-Final Round Events
+            </label>
+            <textarea
+              id="post_final_round"
+              name="post_final_round"
+              placeholder="Key events after the last primary round: traction, deals, pivots, failed processes."
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label for="board_members">
+              Board Members / Governance
+            </label>
+            <textarea
+              id="board_members"
+              name="board_members"
+              placeholder="Board composition, investor roles, governance dynamics."
+            ></textarea>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Performance & Lessons</legend>
+          <div class="field">
+            <label for="what_went_well">
+              What Went Well
+            </label>
+            <textarea
+              id="what_went_well"
+              name="what_went_well"
+              placeholder="Major successes, milestones, and strengths of the investment."
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label for="challenges">
+              Challenges
+            </label>
+            <textarea
+              id="challenges"
+              name="challenges"
+              placeholder="Execution issues, market headwinds, product gaps, team challenges, etc."
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label for="lessons_learned">
+              Lessons Learned
+            </label>
+            <textarea
+              id="lessons_learned"
+              name="lessons_learned"
+              placeholder="Portfolio-level learnings, thesis refinement, what you'd repeat or avoid."
+            ></textarea>
+          </div>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit">
+            Generate Exit Memo
+            <span aria-hidden="true">↗</span>
+          </button>
+          <span class="secondary">
+            The JSON response from n8n will open in this tab.
+          </span>
+        </div>
+
+        <!-- Optional simple status text if you later wire up JS fetch instead of plain form POST -->
+        <div id="status" class="status"></div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
