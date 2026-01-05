@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- saved from url=(0050)file:///Users/kategilman/Downloads/v2exitmemo.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
   <title>Exit Memo Generator</title>
@@ -82,7 +81,8 @@
     input[type="text"],
     input[type="number"],
     input[type="date"],
-    textarea {
+    textarea,
+    select {
       border-radius: 10px;
       border: 1px solid #d1d5db;
       background: #f9fafb;
@@ -101,7 +101,8 @@
       resize: vertical;
     }
     input:focus,
-    textarea:focus {
+    textarea:focus,
+    select:focus {
       border-color: #4f46e5;
       box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.25);
       background: #ffffff;
@@ -183,6 +184,19 @@
     .add-round-btn:hover {
       background: #f3f4f6;
       border-color: #9ca3af;
+    }
+
+    /* --- Conditional Field Styling --- */
+    .conditional-field {
+      display: none;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #fefce8;
+      border-radius: 10px;
+      border: 1px solid #fde047;
+    }
+    .conditional-field.visible {
+      display: block;
     }
   </style>
 </head>
@@ -299,6 +313,26 @@
           <div class="field"><label>Final Result for Investors</label><textarea name="investor_outcome"></textarea></div>
         </fieldset>
 
+        <!-- 6: Looking Forward (Conditional) -->
+        <fieldset>
+          <legend>Looking Forward</legend>
+          <div class="field">
+            <label>Is there remaining value in this investment?</label>
+            <select id="remainingValueSelect" name="has_remaining_value">
+              <option value="no">No remaining value</option>
+              <option value="yes">Yes, there is remaining value</option>
+            </select>
+          </div>
+
+          <div id="lookingForwardField" class="conditional-field">
+            <div class="field">
+              <label>Looking Forward Commentary</label>
+              <span class="hint">Describe what the company plans to do next and/or AV's strategy for managing the remaining position (e.g., public shares, earnout, escrow, lock-up periods, distribution plans)</span>
+              <textarea name="looking_forward" rows="6"></textarea>
+            </div>
+          </div>
+        </fieldset>
+
         <div class="actions">
           <button type="submit">Generate Exit Memo ↗</button>
           <span class="secondary">The JSON response will open in this tab.</span>
@@ -310,6 +344,7 @@
 
   <script>
     (function () {
+      // === Additional Rounds Logic ===
       const container = document.getElementById("otherRoundsContainer");
       const addBtn = document.getElementById("addRoundBtn");
       let roundCount = 1;
@@ -354,9 +389,19 @@
         const btn = group.querySelector(".delete-round-btn");
         if (btn) attachDeleteHandler(btn, group);
       });
+
+      // === Looking Forward Conditional Logic ===
+      const remainingValueSelect = document.getElementById("remainingValueSelect");
+      const lookingForwardField = document.getElementById("lookingForwardField");
+
+      remainingValueSelect.addEventListener("change", function () {
+        if (this.value === "yes") {
+          lookingForwardField.classList.add("visible");
+        } else {
+          lookingForwardField.classList.remove("visible");
+        }
+      });
     })();
   </script>
-
-
 
 </body></html>
