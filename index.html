@@ -135,4 +135,260 @@
       box-shadow: 0 10px 28px rgba(79, 70, 229, 0.5);
     }
     .round-group {
-      borde
+      border-radius: 10px;
+      border: 1px dashed #d1d5db;
+      padding: 0.75rem 0.85rem;
+      margin-bottom: 0.75rem;
+      background: #f9fafb;
+      position: relative;
+    }
+    .round-group-title {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #4b5563;
+      margin-bottom: 0.5rem;
+    }
+    .delete-round-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      color: #b91c1c;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.12s ease;
+    }
+    .delete-round-btn:hover {
+      background: #fecaca;
+    }
+    .add-round-btn {
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      color: #4b5563;
+      font-size: 0.85rem;
+      padding: 0.4rem 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.25rem;
+      transition: background 0.12s ease, border-color 0.12s ease;
+    }
+    .add-round-btn:hover {
+      background: #f3f4f6;
+      border-color: #9ca3af;
+    }
+    .conditional-field {
+      display: none;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #fef3c7;
+      border-radius: 10px;
+      border: 1px solid #fbbf24;
+    }
+    .conditional-field.visible {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Exit Memo Generator</h1>
+      <p class="description">
+        Upload diligence reports and fill in the deal details.  
+        This form will POST directly into your n8n workflow.
+      </p>
+
+      <form id="exitMemoForm" action="https://kateg.app.n8n.cloud/webhook-test/exit-memo" method="POST" enctype="multipart/form-data">
+
+        <fieldset>
+          <legend>Diligence Reports</legend>
+          <div class="field">
+            <label for="pdf_file">Upload Diligence PDF(s)</label>
+            <input type="file" id="pdf_file" name="pdf_file" accept="application/pdf" multiple>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Basic Deal Info</legend>
+          <div class="grid">
+            <div class="field">
+              <label>Company Name *</label>
+              <input type="text" name="company_name" required>
+            </div>
+            <div class="field">
+              <label>Exit Date *</label>
+              <input type="date" name="exit_date" required>
+            </div>
+            <div class="field">
+              <label>Acquirer (if applicable)</label>
+              <input type="text" name="acquirer">
+            </div>
+            <div class="field">
+              <label>Exit Value (in millions)</label>
+              <input type="number" name="exit_value" step="0.01">
+            </div>
+            <div class="field">
+              <label>Exit Type</label>
+              <input type="text" name="exit_type">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Investment Rounds &amp; Thesis</legend>
+
+          <div class="field">
+            <label>Initial Investment Round</label>
+            <div class="grid">
+              <div class="field"><label>Round Name</label><input type="text" name="initial_round_name"></div>
+              <div class="field"><label>Round Date</label><input type="date" name="initial_round_date"></div>
+              <div class="field"><label>Valuation at the time (M)</label><input type="number" step="0.01" name="initial_round_valuation"></div>
+              <div class="field"><label>Lead Investor</label><input type="text" name="initial_round_lead"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Key Details of Initial Investment Round</label>
+            <textarea name="initial_round_details"></textarea>
+          </div>
+
+          <div class="field">
+            <label>What AV Liked About This Initial Investment</label>
+            <textarea name="initial_round_liked"></textarea>
+          </div>
+
+          <div class="field">
+            <label>Additional Investment Rounds (if any)</label>
+
+            <div id="otherRoundsContainer">
+              <div class="round-group">
+                <button type="button" class="delete-round-btn">Delete</button>
+                <div class="round-group-title">Additional Round 1</div>
+
+                <div class="grid">
+                  <div class="field"><label>Round Name</label><input type="text" name="other_round_name[]"></div>
+                  <div class="field"><label>Round Date</label><input type="date" name="other_round_date[]"></div>
+                  <div class="field"><label>Valuation at the time (M)</label><input type="number" step="0.01" name="other_round_valuation[]"></div>
+                  <div class="field"><label>Lead Investor</label><input type="text" name="other_round_lead[]"></div>
+                </div>
+
+                <div class="field">
+                  <label>Other Details About This Round</label>
+                  <textarea name="other_round_details[]"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="add-round-btn" id="addRoundBtn">+ Add Another Round</button>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Performance Between Investment and Exit</legend>
+          <div class="field"><label>Overall Performance</label><textarea name="performance_overview"></textarea></div>
+          <div class="field"><label>What Went Well</label><textarea name="what_went_well"></textarea></div>
+          <div class="field"><label>Challenges</label><textarea name="challenges"></textarea></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Exit Timeline &amp; Outcome</legend>
+          <div class="field"><label>Exit Timeline Summary</label><textarea name="exit_timeline"></textarea></div>
+          <div class="field"><label>Final Result for Investors</label><textarea name="investor_outcome"></textarea></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Looking Forward</legend>
+          <div class="field">
+            <label>Is there remaining value in this investment?</label>
+            <select id="remainingValueSelect" name="has_remaining_value">
+              <option value="no">No remaining value</option>
+              <option value="yes">Yes, there is remaining value</option>
+            </select>
+          </div>
+
+          <div id="lookingForwardField" class="conditional-field">
+            <div class="field">
+              <label>Looking Forward Commentary</label>
+              <span class="hint">Describe what the company plans to do next and/or AV's strategy for managing the remaining position (e.g., public shares, earnout, escrow, lock-up periods, distribution plans)</span>
+              <textarea name="looking_forward" rows="6"></textarea>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit">Generate Exit Memo</button>
+          <span class="secondary">The PDF will be generated and downloaded.</span>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const container = document.getElementById("otherRoundsContainer");
+      const addBtn = document.getElementById("addRoundBtn");
+      let roundCount = 1;
+
+      function attachDeleteHandler(btn, group) {
+        btn.addEventListener("click", function() {
+          group.remove();
+        });
+      }
+
+      addBtn.addEventListener("click", function () {
+        roundCount += 1;
+
+        const group = document.createElement("div");
+        group.className = "round-group";
+
+        group.innerHTML = `
+          <button type="button" class="delete-round-btn">Delete</button>
+          <div class="round-group-title">Additional Round ${roundCount}</div>
+
+          <div class="grid">
+            <div class="field"><label>Round Name</label><input type="text" name="other_round_name[]" /></div>
+            <div class="field"><label>Round Date</label><input type="date" name="other_round_date[]" /></div>
+            <div class="field"><label>Valuation at the time (M)</label><input type="number" step="0.01" name="other_round_valuation[]" /></div>
+            <div class="field"><label>Lead Investor</label><input type="text" name="other_round_lead[]" /></div>
+          </div>
+
+          <div class="field">
+            <label>Other Details About This Round</label>
+            <textarea name="other_round_details[]"></textarea>
+          </div>
+        `;
+
+        const deleteBtn = group.querySelector(".delete-round-btn");
+        attachDeleteHandler(deleteBtn, group);
+
+        container.appendChild(group);
+      });
+
+      document.querySelectorAll(".round-group").forEach(function(group) {
+        const btn = group.querySelector(".delete-round-btn");
+        if (btn) attachDeleteHandler(btn, group);
+      });
+
+      const remainingValueSelect = document.getElementById("remainingValueSelect");
+      const lookingForwardField = document.getElementById("lookingForwardField");
+
+      remainingValueSelect.addEventListener("change", function () {
+        if (this.value === "yes") {
+          lookingForwardField.classList.add("visible");
+        } else {
+          lookingForwardField.classList.remove("visible");
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>
